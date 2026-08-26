@@ -1,5 +1,6 @@
 package jobtracker.service;
 
+import jobtracker.security.JwtUtil;
 import jobtracker.entity.User;
 import jobtracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,13 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public User register(String username, String email, String rawPassword) {
@@ -37,5 +40,16 @@ public class AuthService {
         User newUser = new User(username, email, hashedPassword);
 
         return userRepository.save(newUser);
+    }
+
+    public String login(String username, String rawPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        return jwtUtil.generateToken(user.getUsername());
     }
 }
