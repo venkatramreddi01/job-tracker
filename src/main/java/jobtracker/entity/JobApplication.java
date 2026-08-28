@@ -18,6 +18,10 @@ public class JobApplication {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status;
@@ -30,9 +34,10 @@ public class JobApplication {
     public JobApplication() {
     }
 
-    public JobApplication(String role, Company company, ApplicationStatus status, LocalDate appliedDate) {
+    public JobApplication(String role, Company company, User user, ApplicationStatus status, LocalDate appliedDate) {
         this.role = role;
         this.company = company;
+        this.user = user;
         this.status = status;
         this.appliedDate = appliedDate;
     }
@@ -55,4 +60,7 @@ public class JobApplication {
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
 }
