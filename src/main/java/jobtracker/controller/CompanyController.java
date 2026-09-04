@@ -25,7 +25,14 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<Company> create(@RequestBody Company company) {
+    public ResponseEntity<?> create(@RequestBody Company company) {
+        boolean alreadyExists = companyRepository.findAll().stream()
+                .anyMatch(c -> c.getName().equalsIgnoreCase(company.getName()));
+
+        if (alreadyExists) {
+            return ResponseEntity.badRequest().body("A company with this name already exists");
+        }
+
         return ResponseEntity.ok(companyRepository.save(company));
     }
 }
